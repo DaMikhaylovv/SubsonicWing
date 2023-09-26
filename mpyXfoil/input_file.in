@@ -1,0 +1,12 @@
+NACA0012
+OPER
+visc 6000000.0
+iter 150
+pacc
+polar1
+polar2
+aseq
+0
+25
+2
+quit
