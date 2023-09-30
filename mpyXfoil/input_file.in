@@ -1,12 +1,15 @@
-NACA0012
+load
+AG03.txt
+mdes
+filt
+exec
+
+pane
 OPER
-visc 6000000.0
-iter 150
-pacc
-polar1
-polar2
-aseq
-0
-25
-2
+visc 1700000.0
+iter 70
+Cl 0.6
+cpwr f
+
+
 quit
