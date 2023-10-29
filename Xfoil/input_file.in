@@ -1,0 +1,12 @@
+NACA23008
+OPER
+visc 8000000.0
+iter 70
+pacc
+polar1
+polar2
+aseq
+-20
+20
+2
+quit

@@ -1,6 +1,7 @@
 import os.path
 import subprocess
 import numpy as np
+from scipy.optimize import fsolve
 import re
 
 def read_pack(filename):
@@ -20,7 +21,7 @@ def read_pack(filename):
     
         if value != []:
             data.append(value)
-    data = data[3:]
+    data = data[5:]
     float_data = [[float(column) for column in row] for row in data]
     float_data = np.array(float_data)
     return float_data
@@ -87,6 +88,7 @@ def get_ADX(airfoil, Re, alpha_min, alpha_max, step, ITER):
     result['x_F'] = - read_pack('polar1')[:, 4] / read_pack('polar1')[:, 1] + 0.25
     os.remove('polar1')
     os.remove('polar2')
+    os.remove('input_file.in')
     return result
 
 def get_Cp_x(airfoil, Re, ITER, alpha):
@@ -123,4 +125,24 @@ def get_Cp_x(airfoil, Re, ITER, alpha):
     result['x'] = read_pack('f')[:, 0]
     result['y'] = read_pack('f')[:, 1]
     result['Cp'] = read_pack('f')[:, 2]
+    os.remove('f')
+    os.remove('input_file.in')
     return result
+
+def get_M_cr_Khristianovich(Cp):
+    k = 1.4
+    h = np.sqrt((k+1) / (k-1))
+    def u_def(lam):
+        return h*np.sqrt((1- lam**2) / (h**2 - lam**2))
+    def L_def(lam):
+        return lam*2*np.sqrt(((h-1) ** (h-1)) / ((h+1) ** (h+1))) * np.sqrt(((h+u_def(lam)) ** (h+1)) / (((h - u_def(lam)) ** (h-1)) * ((u_def(lam)+1) ** (2))))
+    def a_def(lam):
+        return L_def(lam) / lam
+    def L_inf_def(Cp):
+        return L_def(1) / (np.sqrt(1 - Cp))
+    def L_def_for_solve(lam):
+        return - L_inf_def(Cp) + lam*2*np.sqrt(((h-1) ** (h-1)) / ((h+1) ** (h+1))) * np.sqrt(((h+u_def(lam)) ** (h+1)) / (((h - u_def(lam)) ** (h-1)) * ((u_def(lam)+1) ** (2))))
+    lam_inf_kr = fsolve(L_def_for_solve, 0.1)
+    def M_kr_def(lam_inf_kr):
+        return lam_inf_kr * (((k+1) / 2) - ((k-1) / 2 * lam_inf_kr**2)) ** (-1/2)
+    return M_kr_def(lam_inf_kr)[0]
