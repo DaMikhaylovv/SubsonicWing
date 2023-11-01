@@ -129,6 +129,43 @@ def get_Cp_x(airfoil, Re, ITER, alpha):
     os.remove('input_file.in')
     return result
 
+def get_airfoil_coords(airfoil_name):
+    '''
+    Получение координат профиля из Xfoil
+
+    Ввод: airfoil_name: float - название профиля
+
+    Вывод: x: numpy.array - массив координат x профиля
+          y: numpy.array - массив координат y профиля
+    '''
+    
+    try:
+        import os
+        os.remove('polar1')
+        os.remove('polar2')
+    except:
+        pass
+
+    input_file = open("input_file.in", 'w')
+    input_file.write(airfoil_name)
+    input_file.write('\n')
+    input_file.write("psav\n")
+    input_file.write("airfoil_coords.dat\n")      
+    input_file.write("quit\n")
+    input_file.close()
+    subprocess.call("xfoil.exe < input_file.in", shell=True)
+    
+    # чтение созданного Xfoil файла АДХ
+    coords = read_pack('airfoil_coords.dat')
+    
+    os.remove('airfoil_coords.dat')
+    os.remove('input_file.in')
+
+    x = coords[:,0]
+    y = coords[:,1]
+
+    return x, y
+
 def get_M_cr_Khristianovich(Cp):
     k = 1.4
     h = np.sqrt((k+1) / (k-1))
