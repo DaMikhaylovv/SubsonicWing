@@ -2984,6 +2984,49 @@ Value : float
             f'Аргумент {Result.InvalidArgNumber}, {ErrorMessageTable[Result.ErrorCode]}.')
     else:
         return Result
+def get_alpha_cr_IsP(M, lambda_c):
+    """
+Функция для определения критического угла атаки изолированной несущей поверхности
+
+Параметры
+---------
+M : float
+    число Маха, -
+lambda_c : float
+    удлинение консолей, -
+
+Возврат
+-------
+Value : float
+    критический угол атаки, рад
+x[0] : InputComplex
+    входной комплекс M
+x[1] : InputComplex
+    входной комплекс lambda_c
+
+Ссылки
+------
+Бураго, Корнев. Расчет АД характеристик маневренного ЛА, 2018 (с. 18, Рис.2.7.)
+
+"""
+    #  Указание типов аргументов и возвращаемого значения
+    libstructpy.get_alpha_cr_IsP.argtypes = [        
+        ctypes.c_float,
+        ctypes.c_float,
+    ]
+    libstructpy.get_alpha_cr_IsP.restype = DataResult
+
+    #  Вызов функций, описанных в DLL
+    Result = libstructpy.get_alpha_cr_IsP(        
+        ctypes.c_float(M),
+        ctypes.c_float(lambda_c),
+    )
+
+    if Result.ErrorCode in ErrorMessageTable:
+        raise ValueError(
+            f'Аргумент {Result.InvalidArgNumber}, {ErrorMessageTable[Result.ErrorCode]}.')
+    else:
+        return Result
     
 
 def get_S_bok(D, S_nos, lambda_cil, lambda_cor, eta_cor, M, b_b, L_hv):
